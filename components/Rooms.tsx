@@ -1,27 +1,32 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 
 const rooms = [
-  { name: 'Deluxe Suite', image: '/room-deluxe.jpg', description: 'Spacious suite with city view' },
-  { name: 'Standard Room', image: '/room-standard.jpg', description: 'Comfortable room for a pleasant stay' },
-  // ... (add more rooms as needed)
+  { name: 'Deluxe Suite', image: '/room.jpeg', description: 'Spacious suite with city view' },
+  { name: 'Standard Room', image: '/room-deluxe.jpeg', description: 'Comfortable room for a pleasant stay' },
+  // will add more rooms later
 ]
 
 export default function Rooms() {
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % rooms.length)
-  }
+  }, [])
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + rooms.length) % rooms.length)
-  }
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(nextSlide, 5000) // Auto-slide every 5 seconds
+    return () => clearInterval(interval)
+  }, [nextSlide])
 
   return (
     <section id="rooms" className="py-20">

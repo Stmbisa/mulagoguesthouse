@@ -1,11 +1,15 @@
 'use client'
 
 import Header from '@/components/Header'
-import Hero from '@/components/Hero'
-import Services from '@/components/Services'
-import Rooms from '@/components/Rooms'
 import Footer from '@/components/Footer'
-import ThemeToggle from '@/components/ThemeToggle'
+import dynamic from 'next/dynamic'
+
+// Dynamically import components with ssr option set to false
+const Hero = dynamic(() => import('@/components/Hero'), { ssr: false })
+const Services = dynamic(() => import('@/components/Services'), { ssr: false })
+const Rooms = dynamic(() => import('@/components/Rooms'), { ssr: false })
+const Gallery = dynamic(() => import('@/components/Gallery'), { ssr: false })
+const ThemeToggle = dynamic(() => import('@/components/ThemeToggle'), { ssr: false })
 
 export default function Home() {
   return (
@@ -15,6 +19,7 @@ export default function Home() {
         <Hero />
         <Services />
         <Rooms />
+        <Gallery />
       </main>
       <Footer />
       <ThemeToggle />

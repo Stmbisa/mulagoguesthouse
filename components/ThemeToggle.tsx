@@ -22,9 +22,9 @@ export default function ThemeToggle() {
       variant="outline"
       size="icon"
       className="fixed bottom-4 right-4 rounded-full"
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
     >
-      {theme === 'dark' ? <Sun className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}
+      {theme === 'light' ? <Moon className="h-[1.2rem] w-[1.2rem]" /> : <Sun className="h-[1.2rem] w-[1.2rem]" />}
       <span className="sr-only">Toggle theme</span>
     </Button>
   )

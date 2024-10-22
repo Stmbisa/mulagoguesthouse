@@ -1,29 +1,34 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 
 const services = [
-  { name: 'Gym', image: '/amenity-gym.jpg', description: 'State-of-the-art fitness center', action: 'Book Now' },
-  { name: 'Parking', image: '/parking.jpg', description: 'Secure and convenient parking', action: 'Learn More' },
-  { name: 'Conference', image: '/conference.jpg', description: 'Modern conference facilities', action: 'Book Now' },
-  { name: 'Restaurant', image: '/amenity-restaurant.jpg', description: 'Exquisite dining experiences', action: 'Learn More' },
-  { name: 'Outdoor Shelter', image: '/conference-shelter.jpg', description: 'Beautiful outdoor event space', action: 'Book Now' },
+  { name: 'Gym', image: '/amenity-gym.jpeg', description: 'State-of-the-art fitness center', action: 'Book Now' },
+  { name: 'Parking', image: '/parking.jpeg', description: 'Secure and convenient parking', action: 'Learn More' },
+  { name: 'Conference', image: '/conference1.jpeg', description: 'Modern conference facilities', action: 'Book Now' },
+  { name: 'Restaurant', image: '/amenity-restaurant.jpeg', description: 'Exquisite dining experiences', action: 'Learn More' },
+  { name: 'Outdoor Shelter', image: '/conference-shelter.jpeg', description: 'Beautiful outdoor event space', action: 'Book Now' },
 ]
 
 export default function Services() {
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % services.length)
-  }
+  }, [])
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + services.length) % services.length)
-  }
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(nextSlide, 5000) // Auto-slide every 5 seconds
+    return () => clearInterval(interval)
+  }, [nextSlide])
 
   return (
     <section id="services" className="py-20 bg-muted">

@@ -21,7 +21,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Mulago Hospital Guest House",
-  description: "Mulago Hospital Guest House is a luxirious serene and comfortable place for your stay.",
+  description: "Mulago Hospital Guest House is a luxurious serene and comfortable place for your stay.",
 };
 
 export default function RootLayout({
@@ -31,11 +31,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.className} dark`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
         >
           {children}
