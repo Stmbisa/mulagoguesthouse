@@ -5,10 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const rooms = [
-  { name: 'Deluxe Suite', image: '/room.jpeg', description: 'Spacious suite with city view' },
-  { name: 'Standard Room', image: '/room-deluxe.jpeg', description: 'Comfortable room for a pleasant stay' },
+  { name: 'Deluxe Suite', image: '/room.jpeg', description: 'Spacious suite with city view', id: 'deluxe-001' },
+  { name: 'Standard Room', image: '/room-deluxe.jpeg', description: 'Comfortable room for a pleasant stay', id: 'standard-001' },
   // will add more rooms later
 ]
 
@@ -61,7 +62,11 @@ export default function Rooms() {
                 <div className="p-6">
                   <h3 className="text-2xl font-semibold mb-2">{rooms[currentIndex].name}</h3>
                   <p className="text-muted-foreground mb-4">{rooms[currentIndex].description}</p>
-                  <Button className="bg-green-500 hover:bg-green-600 text-white text-lg px-6 py-2">Book Now</Button>
+                  <Link href={`/rooms/${rooms[currentIndex].id}`}>
+                    <Button className="bg-green-500 hover:bg-green-600 text-white text-lg px-6 py-2">
+                      Book Now
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </motion.div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Moon, Sun } from 'lucide-react'
+import { Moon, Sun, Laptop } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
 
@@ -22,9 +22,19 @@ export default function ThemeToggle() {
       variant="outline"
       size="icon"
       className="fixed bottom-4 right-4 rounded-full"
-      onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+      onClick={() => {
+        if (theme === 'system') {
+          setTheme('light')
+        } else if (theme === 'light') {
+          setTheme('dark')
+        } else {
+          setTheme('system')
+        }
+      }}
     >
-      {theme === 'light' ? <Moon className="h-[1.2rem] w-[1.2rem]" /> : <Sun className="h-[1.2rem] w-[1.2rem]" />}
+      {theme === 'light' && <Sun className="h-[1.2rem] w-[1.2rem]" />}
+      {theme === 'dark' && <Moon className="h-[1.2rem] w-[1.2rem]" />}
+      {theme === 'system' && <Laptop className="h-[1.2rem] w-[1.2rem]" />}
       <span className="sr-only">Toggle theme</span>
     </Button>
   )

@@ -22,7 +22,9 @@ export default function Hero() {
 
   const calculateHeight = (baseHeight: number, maxScroll = 500) => {
     const growFactor = Math.min(scrollPosition / maxScroll, 1)
-    return baseHeight * (1 - growFactor)
+    // Limit the maximum height to prevent overlap with content
+    const maxAllowedHeight = window.innerHeight * 0.6 // 60% of viewport height
+    return Math.min(baseHeight * (1 - growFactor), maxAllowedHeight)
   }
 
   return (
@@ -72,45 +74,8 @@ export default function Hero() {
         }}
       />
 
-      {/* Animated City */}
-      <svg
-        className="absolute bottom-0 w-full"
-        viewBox="0 0 1000 400"
-        preserveAspectRatio="none"
-      >
-        {/* Background buildings */}
-        {[...Array(11)].map((_, i) => (
-          <rect
-            key={`building-${i}`}
-            x={i * 90}
-            y={calculateHeight(400 - (i % 3) * 20)}
-            width="80"
-            height={400 - (i % 3) * 20}
-            className={`fill-green-${700 + (i % 2) * 100}`}
-          />
-        ))}
-
-        {/* Windows */}
-        {[...Array(11)].map((_, buildingIndex) => (
-          [...Array(8)].map((_, windowRow) => (
-            [...Array(4)].map((_, windowCol) => (
-              <rect
-                key={`${buildingIndex}-${windowRow}-${windowCol}`}
-                x={10 + buildingIndex * 90 + windowCol * 12}
-                y={calculateHeight(390 - windowRow * 40)}
-                width="8"
-                height="8"
-                className="fill-yellow-300 opacity-75"
-              />
-            ))
-          ))
-        ))}
-
-        {/* Ground */}
-        <rect x="0" y="399" width="1000" height="1" className="fill-green-900" />
-      </svg>
-
-      <div className="relative z-10 space-y-4">
+      {/* Content Section - Moved up slightly */}
+      <div className="relative z-10 space-y-4 mb-32"> {/* Added margin-bottom */}
         <motion.h1
           className="text-4xl md:text-6xl font-bold text-white"
           initial={{ opacity: 0, y: 20 }}
@@ -138,6 +103,46 @@ export default function Hero() {
             </Button>
           </Link>
         </motion.div>
+      </div>
+
+      {/* Animated City - With max height constraint */}
+      <div className="absolute bottom-0 w-full" style={{ maxHeight: '60vh' }}>
+        <svg
+          viewBox="0 0 1000 400"
+          preserveAspectRatio="none"
+          className="w-full h-full"
+        >
+          {/* Background buildings */}
+          {[...Array(11)].map((_, i) => (
+            <rect
+              key={`building-${i}`}
+              x={i * 90}
+              y={calculateHeight(400 - (i % 3) * 20)}
+              width="80"
+              height={400 - (i % 3) * 20}
+              className={`fill-green-${700 + (i % 2) * 100}`}
+            />
+          ))}
+
+          {/* Windows */}
+          {[...Array(11)].map((_, buildingIndex) => (
+            [...Array(8)].map((_, windowRow) => (
+              [...Array(4)].map((_, windowCol) => (
+                <rect
+                  key={`${buildingIndex}-${windowRow}-${windowCol}`}
+                  x={10 + buildingIndex * 90 + windowCol * 12}
+                  y={calculateHeight(390 - windowRow * 40)}
+                  width="8"
+                  height="8"
+                  className="fill-yellow-300 opacity-75"
+                />
+              ))
+            ))
+          ))}
+
+          {/* Ground */}
+          <rect x="0" y="399" width="1000" height="1" className="fill-green-900" />
+        </svg>
       </div>
 
       {/* Scroll indicator */}

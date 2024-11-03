@@ -5,13 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const services = [
-  { name: 'Gym', image: '/amenity-gym.jpeg', description: 'State-of-the-art fitness center', action: 'Book Now' },
-  { name: 'Parking', image: '/parking.jpeg', description: 'Secure and convenient parking', action: 'Learn More' },
-  { name: 'Conference', image: '/conference1.jpeg', description: 'Modern conference facilities', action: 'Book Now' },
-  { name: 'Restaurant', image: '/amenity-restaurant.jpeg', description: 'Exquisite dining experiences', action: 'Learn More' },
-  { name: 'Outdoor Shelter', image: '/conference-shelter.jpeg', description: 'Beautiful outdoor event space', action: 'Book Now' },
+  { name: 'Gym', image: '/amenity-gym.jpeg', description: 'State-of-the-art fitness center', action: 'Book Now', id: 'gym-001' },
+  { name: 'Parking', image: '/parking.jpeg', description: 'Secure and convenient parking', action: 'Learn More', id: 'parking-001' },
+  { name: 'Conference', image: '/conference1.jpeg', description: 'Modern conference facilities', action: 'Book Now', id: 'conference-001' },
+  { name: 'Restaurant', image: '/amenity-restaurant.jpeg', description: 'Exquisite dining experiences', action: 'Learn More', id: 'restaurant-001' },
+  { name: 'Outdoor Shelter', image: '/conference-shelter.jpeg', description: 'Beautiful outdoor event space', action: 'Book Now', id: 'outdoor-shelter-001' },
 ]
 
 export default function Services() {
@@ -63,15 +64,17 @@ export default function Services() {
                 <div className="p-6">
                   <h3 className="text-2xl font-semibold mb-2">{services[currentIndex].name}</h3>
                   <p className="text-muted-foreground mb-4">{services[currentIndex].description}</p>
-                  <Button
-                    className={`text-lg px-6 py-2 ${
-                      services[currentIndex].action === 'Book Now'
-                        ? 'bg-green-500 hover:bg-green-600 text-white'
-                        : 'bg-blue-500 hover:bg-blue-600 text-white'
-                    }`}
-                  >
-                    {services[currentIndex].action}
-                  </Button>
+                  <Link href={`/services/${services[currentIndex].id}`}>
+                    <Button
+                      className={`text-lg px-6 py-2 ${
+                        services[currentIndex].action === 'Book Now'
+                          ? 'bg-green-500 hover:bg-green-600 text-white'
+                          : 'bg-blue-500 hover:bg-blue-600 text-white'
+                      }`}
+                    >
+                      {services[currentIndex].action}
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </motion.div>
