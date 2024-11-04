@@ -2,20 +2,20 @@ import { Metadata } from 'next'
 import Image from 'next/image'
 
 export const metadata: Metadata = {
-  title: 'About Us - Mulago Guest House',
-  description: 'Learn about Mulago Guest House, our history, mission, and commitment to exceptional hospitality.',
+  title: 'About Us - Mulago Hospital Guest House',
+  description: 'Learn about Mulago Hospital Guest House, our history, mission, and commitment to exceptional hospitality.',
 }
 
 export default function AboutPage() {
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-6">About Mulago Guest House</h1>
+        <h1 className="text-4xl font-bold mb-6">About Mulago Hospital Guest House</h1>
 
         <div className="aspect-video relative rounded-lg overflow-hidden mb-8">
           <Image
-            src="/about-hero.jpg"
-            alt="Mulago Guest House"
+            src="/view2.jpeg"
+            alt="Mulago Hospital Guest House"
             fill
             className="object-cover"
             priority
@@ -25,7 +25,7 @@ export default function AboutPage() {
         <div className="prose prose-green max-w-none">
           <h2>Our Story</h2>
           <p>
-            Located in the heart of Kampala, Mulago Guest House has been providing exceptional
+            Located in the heart of Kampala, Mulago Hospital Guest House has been providing exceptional
             hospitality services since [year]. Our commitment to excellence and attention to
             detail has made us a preferred choice for both business and leisure travelers.
           </p>

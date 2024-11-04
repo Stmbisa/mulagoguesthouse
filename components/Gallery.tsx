@@ -21,7 +21,7 @@ const images = {
     { src: '/services-pool.jpeg', alt: 'Pool' },
   ],
   views: [
-    { src: '/view1.jpeg', alt: 'Mulago Guest House View 1' },
+    { src: '/view1.jpeg', alt: 'Mulago Hospital Guest House View 1' },
     { src: '/view2.jpeg', alt: 'Mulago Guest House View 2' },
     { src: '/view3.jpeg', alt: 'Mulago Guest House View 3' },
   ],

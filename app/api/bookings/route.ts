@@ -9,16 +9,69 @@ const twilioClient = twilio(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
 )
+// Add tracking interface
+interface BookingLog {
+  timestamp: string
+  bookingType: string
+  itemName: string
+  customerEmail: string
+  status: 'success' | 'failed'
+  error?: string
+}
 
+// Initialize transporter
 const emailTransporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: false,
+  host: process.env.MAIL_SERVER,
+  port: parseInt(process.env.MAIL_PORT || '587'),
+  secure: process.env.MAIL_PORT === '465',
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
+    user: process.env.MAIL_USERNAME,
+    pass: process.env.MAIL_PASSWORD,
   },
 })
+
+// Add logging function
+async function logBooking(log: BookingLog) {
+  // Log to console
+  console.log(JSON.stringify(log, null, 2))
+
+  // Send log via email
+  const adminEmails = (process.env.ADMIN_EMAIL_RECIPIENTS || '').split(',')
+    .map(email => email.trim())
+    .filter(email => email)
+
+  if (adminEmails.length > 0) {
+    try {
+      await emailTransporter.sendMail({
+        from: process.env.MAIL_FROM,
+        to: adminEmails,
+        subject: `Booking ${log.status.toUpperCase()}: ${log.itemName}`,
+        text: `
+Booking Log:
+- Timestamp: ${log.timestamp}
+- Type: ${log.bookingType}
+- Item: ${log.itemName}
+- Customer: ${log.customerEmail}
+- Status: ${log.status}
+${log.error ? `- Error: ${log.error}` : ''}
+        `,
+        html: `
+<h2>Booking Log</h2>
+<ul>
+  <li><strong>Timestamp:</strong> ${log.timestamp}</li>
+  <li><strong>Type:</strong> ${log.bookingType}</li>
+  <li><strong>Item:</strong> ${log.itemName}</li>
+  <li><strong>Customer:</strong> ${log.customerEmail}</li>
+  <li><strong>Status:</strong> ${log.status}</li>
+  ${log.error ? `<li><strong>Error:</strong> ${log.error}</li>` : ''}
+</ul>
+        `,
+      })
+    } catch (error) {
+      console.error('Failed to send booking log:', error)
+    }
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -28,6 +81,14 @@ export async function POST(request: Request) {
       : services.find(s => s.id === booking.itemId)
 
     if (!item) {
+      await logBooking({
+        timestamp: new Date().toISOString(),
+        bookingType: booking.type,
+        itemName: 'Unknown',
+        customerEmail: booking.email,
+        status: 'failed',
+        error: 'Invalid item ID'
+      })
       return NextResponse.json(
         { error: 'Invalid item ID' },
         { status: 400 }
@@ -36,7 +97,7 @@ export async function POST(request: Request) {
 
     // Create detailed message
     const whatsappMessage = `
-New Booking at Mulago Guest House!
+New Booking at Mulago Hospital Guest House!
 
 Type: ${booking.type.toUpperCase()}
 Item: ${item.name}
@@ -57,35 +118,64 @@ Please contact the customer to confirm the booking.
     `.trim()
 
     // Send WhatsApp notifications
-    const whatsappNumbers = process.env.NOTIFICATION_WHATSAPP_NUMBERS?.split(',') || []
-    await Promise.all(
-      whatsappNumbers.map(number =>
-        twilioClient.messages.create({
-          body: whatsappMessage,
-          from: process.env.TWILIO_WHATSAPP_FROM,
-          to: number.trim()
-        })
+    const whatsappNumbers = (process.env.NOTIFICATION_WHATSAPP_NUMBERS || '').split(',')
+      .map(number => number.trim())
+      .filter(number => number)
+
+    if (whatsappNumbers.length > 0) {
+      await Promise.allSettled(
+        whatsappNumbers.map(number =>
+          twilioClient.messages.create({
+            body: whatsappMessage,
+            from: process.env.TWILIO_WHATSAPP_FROM,
+            to: number
+          }).catch(error => {
+            console.error(`Failed to send WhatsApp to ${number}:`, error)
+          })
+        )
       )
-    )
+    }
 
     // Send email notifications
-    const emailAddresses = process.env.NOTIFICATION_EMAIL_ADDRESSES?.split(',') || []
-    const emailMessage = createEmailMessage(booking)
+    const emailRecipients = (process.env.NOTIFICATION_EMAIL_RECIPIENTS || '').split(',')
+      .map(email => email.replace('email:', '').trim())
+      .filter(email => email)
 
-    await Promise.all(
-      emailAddresses.map(email =>
-        emailTransporter.sendMail({
-          from: process.env.SMTP_USER,
-          to: email.trim(),
-          subject: `New Booking: ${booking.type === 'room' ? 'Room' : 'Service'} Booking`,
-          text: emailMessage,
-          html: createEmailHTML(booking),
-        })
+    if (emailRecipients.length > 0) {
+      await Promise.allSettled(
+        emailRecipients.map(email =>
+          emailTransporter.sendMail({
+            from: process.env.MAIL_FROM,
+            to: email,
+            subject: `New Booking: ${item.name} - Mulago Hospital Guest House`,
+            text: createEmailMessage(booking),
+            html: createEmailHTML(booking),
+          }).catch(error => {
+            console.error(`Failed to send email to ${email}:`, error)
+          })
+        )
       )
-    )
+    }
+
+    await logBooking({
+      timestamp: new Date().toISOString(),
+      bookingType: booking.type,
+      itemName: item.name,
+      customerEmail: booking.email,
+      status: 'success'
+    })
 
     return NextResponse.json({ success: true })
   } catch (error) {
+    await logBooking({
+      timestamp: new Date().toISOString(),
+      bookingType: 'unknown',
+      itemName: 'unknown',
+      customerEmail: 'unknown',
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
+
     console.error('Booking error:', error)
     return NextResponse.json(
       { error: 'Failed to process booking' },

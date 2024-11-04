@@ -3,6 +3,7 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import dynamic from 'next/dynamic'
+import ContactForm from '@/components/ContactForm'
 
 // Dynamically import components with ssr option set to false
 const Hero = dynamic(() => import('@/components/Hero'), { ssr: false })
@@ -13,13 +14,16 @@ const ThemeToggle = dynamic(() => import('@/components/ThemeToggle'), { ssr: fal
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
-      <main>
+      <main className="flex-grow">
         <Hero />
         <Services />
         <Rooms />
         <Gallery />
+        <div className="bg-gradient-to-b from-background via-green-50/50 to-background dark:via-green-950/50">
+          <ContactForm />
+        </div>
       </main>
       <Footer />
       <ThemeToggle />

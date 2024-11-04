@@ -5,7 +5,7 @@ import { services } from '@/data'
 import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
-  title: 'Our Services - Mulago Guest House',
+  title: 'Our Services - Mulago Hospital Guest House',
   description: 'Explore our range of services and amenities',
 }
 
@@ -30,11 +30,10 @@ export default function ServicesPage() {
               <p className="text-lg font-bold mb-4">{service.price}</p>
               <Link href={`/services/${service.id}`}>
                 <Button
-                  className={`w-full ${
-                    service.action === 'Book Now'
+                  className={`w-full ${service.action === 'Book Now'
                       ? 'bg-green-500 hover:bg-green-600'
                       : 'bg-blue-500 hover:bg-blue-600'
-                  }`}
+                    }`}
                 >
                   {service.action}
                 </Button>

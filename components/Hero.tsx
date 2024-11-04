@@ -31,7 +31,7 @@ export default function Hero() {
     <section className="relative h-screen flex items-center justify-center text-center overflow-hidden">
       <Image
         src="/view1.jpeg"
-        alt="Mulago Guest House night view"
+        alt="Mulago Hospital Guest House night view"
         fill
         style={{ objectFit: 'cover' }}
         quality={100}
@@ -82,7 +82,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          Welcome to Mulago Guest House
+          Welcome to Mulago Hospital Guest House
         </motion.h1>
         <motion.p
           className="text-xl text-white/80"

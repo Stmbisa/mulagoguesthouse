@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { BookingDetails } from '@/types'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 interface BookingFormProps {
   type: 'room' | 'service'
@@ -15,6 +16,7 @@ interface BookingFormProps {
 
 export default function BookingForm({ type, itemId, itemName }: BookingFormProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -43,12 +45,21 @@ export default function BookingForm({ type, itemId, itemName }: BookingFormProps
         body: JSON.stringify(bookingDetails),
       })
 
-      if (!response.ok) throw new Error('Booking failed')
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Failed to submit booking')
+      }
 
-      toast.success('Booking submitted successfully! We will contact you shortly.')
-      e.currentTarget.reset()
+      toast.success('Booking submitted successfully!')
+      router.push(`/booking-success?type=${type}&name=${encodeURIComponent(itemName)}`)
     } catch (error) {
-      toast.error('Failed to submit booking. Please try again.')
+      toast.error(
+        'Unable to process your booking at this time. Please try again later or contact us directly.',
+        {
+          duration: 5000,
+        }
+      )
+      console.error('Booking error:', error)
     } finally {
       setIsLoading(false)
     }

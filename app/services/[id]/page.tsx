@@ -16,10 +16,10 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
   if (!service) return { title: 'Service Not Found' }
 
   return {
-    title: `${service.name} - Mulago Guest House`,
+    title: `${service.name} - Mulago Hospital Guest House`,
     description: service.fullDescription,
     openGraph: {
-      title: `${service.name} - Mulago Guest House`,
+      title: `${service.name} - Mulago Hospital Guest House`,
       description: service.fullDescription,
       images: [{ url: service.image }],
     },
@@ -44,7 +44,7 @@ export default function ServicePage({ params }: ServicePageProps) {
             <h1 className="text-3xl font-bold">{service.name}</h1>
             <ShareButtons
               url={`${process.env.NEXT_PUBLIC_BASE_URL}/services/${service.id}`}
-              title={`${service.name} - Mulago Guest House`}
+              title={`${service.name} - Mulago Hospital Guest House`}
               description={service.fullDescription}
             />
           </div>

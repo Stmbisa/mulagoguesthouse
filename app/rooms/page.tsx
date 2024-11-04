@@ -5,7 +5,7 @@ import { rooms } from '@/data'
 import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
-  title: 'Our Rooms - Mulago Guest House',
+  title: 'Our Rooms - Mulago Hospital Guest House',
   description: 'Browse our comfortable and luxurious rooms',
 }
 

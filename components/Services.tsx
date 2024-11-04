@@ -56,8 +56,10 @@ export default function Services() {
                   <Image
                     src={services[currentIndex].image}
                     alt={services[currentIndex].name}
-                    layout="fill"
-                    objectFit="cover"
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority
+                    fill
                   />
                   <div className="absolute inset-0 bg-black/30"></div>
                 </div>

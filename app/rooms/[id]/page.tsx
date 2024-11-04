@@ -16,10 +16,10 @@ export async function generateMetadata({ params }: RoomPageProps): Promise<Metad
   if (!room) return { title: 'Room Not Found' }
 
   return {
-    title: `${room.name} - Mulago Guest House`,
+    title: `${room.name} - Mulago Hospital Guest House`,
     description: room.fullDescription,
     openGraph: {
-      title: `${room.name} - Mulago Guest House`,
+      title: `${room.name} - Mulago Hospital Guest Houseest House`,
       description: room.fullDescription,
       images: [{ url: room.image }],
     },
@@ -44,7 +44,7 @@ export default function RoomPage({ params }: RoomPageProps) {
             <h1 className="text-3xl font-bold">{room.name}</h1>
             <ShareButtons
               url={`${process.env.NEXT_PUBLIC_BASE_URL}/rooms/${room.id}`}
-              title={`${room.name} - Mulago Guest House`}
+              title={`${room.name} - Mulago Hospital Guest House`}
               description={room.fullDescription}
             />
           </div>
