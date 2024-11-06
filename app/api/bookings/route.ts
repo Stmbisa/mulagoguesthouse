@@ -19,18 +19,16 @@ interface BookingLog {
   error?: string
 }
 
-// Instead of initializing at module level, create a function
-function getEmailTransporter() {
-  return nodemailer.createTransport({
-    host: process.env.MAIL_SERVER,
-    port: parseInt(process.env.MAIL_PORT || '587'),
-    secure: process.env.MAIL_PORT === '465',
-    auth: {
-      user: process.env.MAIL_USERNAME,
-      pass: process.env.MAIL_PASSWORD,
-    },
-  })
-}
+// Initialize transporter
+const emailTransporter = nodemailer.createTransport({
+  host: process.env.MAIL_SERVER,
+  port: parseInt(process.env.MAIL_PORT || '587'),
+  secure: process.env.MAIL_PORT === '465',
+  auth: {
+    user: process.env.MAIL_USERNAME,
+    pass: process.env.MAIL_PASSWORD,
+  },
+})
 
 // Modify the logBooking function to create transporter when needed
 async function logBooking(log: BookingLog) {
@@ -40,39 +38,38 @@ async function logBooking(log: BookingLog) {
     .map(email => email.trim())
     .filter(email => email)
 
-  if (adminEmails.length > 0) {
-    try {
-      const emailTransporter = getEmailTransporter()
-      await emailTransporter.sendMail({
-        from: process.env.MAIL_FROM,
-        to: adminEmails,
-        subject: `Booking ${log.status.toUpperCase()}: ${log.itemName}`,
-        text: `
-          Booking Log:
-          - Timestamp: ${log.timestamp}
-          - Type: ${log.bookingType}
-          - Item: ${log.itemName}
-          - Customer: ${log.customerEmail}
-          - Status: ${log.status}
-          ${log.error ? `- Error: ${log.error}` : ''}
-                  `,
-                  html: `
-          <h2>Booking Log</h2>
-          <ul>
-            <li><strong>Timestamp:</strong> ${log.timestamp}</li>
-            <li><strong>Type:</strong> ${log.bookingType}</li>
-            <li><strong>Item:</strong> ${log.itemName}</li>
-            <li><strong>Customer:</strong> ${log.customerEmail}</li>
-            <li><strong>Status:</strong> ${log.status}</li>
-            ${log.error ? `<li><strong>Error:</strong> ${log.error}</li>` : ''}
-          </ul>
-        `,
-      })
-    } catch (error) {
-      console.error('Failed to send booking log:', error)
+    if (adminEmails.length > 0) {
+      try {
+        await emailTransporter.sendMail({
+          from: process.env.MAIL_FROM,
+          to: adminEmails,
+          subject: `Booking ${log.status.toUpperCase()}: ${log.itemName}`,
+          text: `
+            Booking Log:
+            - Timestamp: ${log.timestamp}
+            - Type: ${log.bookingType}
+            - Item: ${log.itemName}
+            - Customer: ${log.customerEmail}
+            - Status: ${log.status}
+            ${log.error ? `- Error: ${log.error}` : ''}
+                    `,
+                    html: `
+            <h2>Booking Log</h2>
+            <ul>
+              <li><strong>Timestamp:</strong> ${log.timestamp}</li>
+              <li><strong>Type:</strong> ${log.bookingType}</li>
+              <li><strong>Item:</strong> ${log.itemName}</li>
+              <li><strong>Customer:</strong> ${log.customerEmail}</li>
+              <li><strong>Status:</strong> ${log.status}</li>
+              ${log.error ? `<li><strong>Error:</strong> ${log.error}</li>` : ''}
+            </ul>
+          `,
+        })
+      } catch (error) {
+        console.error('Failed to send booking log:', error)
+      }
     }
   }
-}
 
 export async function POST(request: Request) {
   try {
@@ -98,24 +95,24 @@ export async function POST(request: Request) {
 
     // Create detailed message
     const whatsappMessage = `
-New Booking at Mulago Hospital Guest House!
+        New Booking at Mulago Hospital Guest House!
 
-Type: ${booking.type.toUpperCase()}
-Item: ${item.name}
-Price: ${typeof item.price === 'number' ? `$${item.price}` : item.price}
+        Type: ${booking.type.toUpperCase()}
+        Item: ${item.name}
+        Price: ${typeof item.price === 'number' ? `$${item.price}` : item.price}
 
-Customer Details:
-- Name: ${booking.customerName}
-- Email: ${booking.email}
-- Phone: ${booking.phone}
-${booking.type === 'room' ? `
-- Check-in: ${booking.checkIn}
-- Check-out: ${booking.checkOut}
-- Guests: ${booking.numberOfGuests}` : ''}
-${booking.specialRequests ? `
-Special Requests: ${booking.specialRequests}` : ''}
+        Customer Details:
+        - Name: ${booking.customerName}
+        - Email: ${booking.email}
+        - Phone: ${booking.phone}
+        ${booking.type === 'room' ? `
+        - Check-in: ${booking.checkIn}
+        - Check-out: ${booking.checkOut}
+        - Guests: ${booking.numberOfGuests}` : ''}
+        ${booking.specialRequests ? `
+        Special Requests: ${booking.specialRequests}` : ''}
 
-Please contact the customer to confirm the booking.
+        Please contact the customer to confirm the booking.
     `.trim()
 
     // Send WhatsApp notifications
@@ -145,89 +142,88 @@ Please contact the customer to confirm the booking.
         );
       }
 
-    // Send email notifications
-    const emailRecipients = (process.env.NOTIFICATION_EMAIL_RECIPIENTS || '').split(',')
-      .map(email => email.replace('email:', '').trim())
-      .filter(email => email)
+     // Send email notifications
+     const emailRecipients = (process.env.NOTIFICATION_EMAIL_RECIPIENTS || '').split(',')
+     .map(email => email.replace('email:', '').trim())
+     .filter(email => email)
 
-    if (emailRecipients.length > 0) {
-    const emailTransporter = getEmailTransporter() // Create transporter instance
-    await Promise.allSettled(
-      emailRecipients.map(email =>
-        emailTransporter.sendMail({
-          from: process.env.MAIL_FROM,
-          to: email,
-          subject: `New Booking: ${item.name} - Mulago Hospital Guest House`,
-          text: createEmailMessage(booking),
-          html: createEmailHTML(booking),
-        }).catch(error => {
-            console.error(`Failed to send email to ${email}:`, error)
-          })
-        )
-      )
-    }
+   if (emailRecipients.length > 0) {
+     await Promise.allSettled(
+       emailRecipients.map(email =>
+         emailTransporter.sendMail({
+           from: process.env.MAIL_FROM,
+           to: email,
+           subject: `New Booking: ${item.name} - Mulago Hospital Guest House`,
+           text: createEmailMessage(booking),
+           html: createEmailHTML(booking),
+         }).catch(error => {
+           console.error(`Failed to send email to ${email}:`, error)
+         })
+       )
+     )
+   }
 
-    await logBooking({
-      timestamp: new Date().toISOString(),
-      bookingType: booking.type,
-      itemName: item.name,
-      customerEmail: booking.email,
-      status: 'success'
-    })
+   await logBooking({
+     timestamp: new Date().toISOString(),
+     bookingType: booking.type,
+     itemName: item.name,
+     customerEmail: booking.email,
+     status: 'success'
+   })
 
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    await logBooking({
-      timestamp: new Date().toISOString(),
-      bookingType: 'unknown',
-      itemName: 'unknown',
-      customerEmail: 'unknown',
-      status: 'failed',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    })
+   return NextResponse.json({ success: true })
+ } catch (error) {
+   await logBooking({
+     timestamp: new Date().toISOString(),
+     bookingType: 'unknown',
+     itemName: 'unknown',
+     customerEmail: 'unknown',
+     status: 'failed',
+     error: error instanceof Error ? error.message : 'Unknown error'
+   })
 
-    console.error('Booking error:', error)
-    return NextResponse.json(
-      { error: 'Failed to process booking' },
-      { status: 500 }
-    )
-  }
+   console.error('Booking error:', error)
+   return NextResponse.json(
+     { error: 'Failed to process booking' },
+     { status: 500 }
+   )
+ }
 }
 
 function createWhatsAppMessage(booking: BookingDetails): string {
-    return `
-  New ${booking.type} Booking!
+   return `
+ New ${booking.type} Booking!
 
-  Customer: ${booking.customerName}
-  Email: ${booking.email}
-  Phone: ${booking.phone}
-  ${booking.type === 'room' ? `
-  Check-in: ${booking.checkIn}
-  Check-out: ${booking.checkOut}
-  Guests: ${booking.numberOfGuests}` : ''}
-  ${booking.specialRequests ? `
-  Special Requests: ${booking.specialRequests}` : ''}
-  `
-  }
+ Customer: ${booking.customerName}
+ Email: ${booking.email}
+ Phone: ${booking.phone}
+ ${booking.type === 'room' ? `
+ Check-in: ${booking.checkIn}
+ Check-out: ${booking.checkOut}
+ Guests: ${booking.numberOfGuests}` : ''}
+ ${booking.specialRequests ? `
+ Special Requests: ${booking.specialRequests}` : ''}
+ `
+ }
 
 function createEmailMessage(booking: BookingDetails): string {
-  return createWhatsAppMessage(booking)
+ return createWhatsAppMessage(booking)
 }
 
 function createEmailHTML(booking: BookingDetails): string {
-  // Create a formatted HTML version of the email
-  return `
-    <h2>New ${booking.type} Booking</h2>
-    <p><strong>Customer:</strong> ${booking.customerName}</p>
-    <p><strong>Email:</strong> ${booking.email}</p>
-    <p><strong>Phone:</strong> ${booking.phone}</p>
-    ${booking.type === 'room' ? `
-    <p><strong>Check-in:</strong> ${booking.checkIn}</p>
-    <p><strong>Check-out:</strong> ${booking.checkOut}</p>
-    <p><strong>Guests:</strong> ${booking.numberOfGuests}</p>
-    ` : ''}
-    ${booking.specialRequests ? `
-    <p><strong>Special Requests:</strong> ${booking.specialRequests}</p>
-    ` : ''}
-  `
+ // Create a formatted HTML version of the email
+ return `
+   <h2>New ${booking.type} Booking</h2>
+   <p><strong>Customer:</strong> ${booking.customerName}</p>
+   <p><strong>Email:</strong> ${booking.email}</p>
+   <p><strong>Phone:</strong> ${booking.phone}</p>
+   ${booking.type === 'room' ? `
+   <p><strong>Check-in:</strong> ${booking.checkIn}</p>
+   <p><strong>Check-out:</strong> ${booking.checkOut}</p>
+   <p><strong>Guests:</strong> ${booking.numberOfGuests}</p>
+   ` : ''}
+   ${booking.specialRequests ? `
+   <p><strong>Special Requests:</strong> ${booking.specialRequests}</p>
+   ` : ''}
+ `
 }
