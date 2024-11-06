@@ -113,6 +113,7 @@ export async function POST(request: Request) {
         Special Requests: ${booking.specialRequests}` : ''}
 
         Please contact the customer to confirm the booking.
+        PS: *THIS IS AN AUTOMATED MESSAGE. COPY THE CONTACT DETAILS AND SEND PERSONALIZED MESSAGES TO THE CUSTOMER* .
     `.trim()
 
     // Send WhatsApp notifications
