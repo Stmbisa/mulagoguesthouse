@@ -19,29 +19,30 @@ interface BookingLog {
   error?: string
 }
 
-// Initialize transporter
-const emailTransporter = nodemailer.createTransport({
-  host: process.env.MAIL_SERVER,
-  port: parseInt(process.env.MAIL_PORT || '587'),
-  secure: process.env.MAIL_PORT === '465',
-  auth: {
-    user: process.env.MAIL_USERNAME,
-    pass: process.env.MAIL_PASSWORD,
-  },
-})
+// Instead of initializing at module level, create a function
+function getEmailTransporter() {
+  return nodemailer.createTransport({
+    host: process.env.MAIL_SERVER,
+    port: parseInt(process.env.MAIL_PORT || '587'),
+    secure: process.env.MAIL_PORT === '465',
+    auth: {
+      user: process.env.MAIL_USERNAME,
+      pass: process.env.MAIL_PASSWORD,
+    },
+  })
+}
 
-// Add logging function
+// Modify the logBooking function to create transporter when needed
 async function logBooking(log: BookingLog) {
-  // Log to console
   console.log(JSON.stringify(log, null, 2))
 
-  // Send log via email
   const adminEmails = (process.env.ADMIN_EMAIL_RECIPIENTS || '').split(',')
     .map(email => email.trim())
     .filter(email => email)
 
   if (adminEmails.length > 0) {
     try {
+      const emailTransporter = getEmailTransporter()
       await emailTransporter.sendMail({
         from: process.env.MAIL_FROM,
         to: adminEmails,
@@ -133,7 +134,7 @@ Please contact the customer to confirm the booking.
                 to: formattedNumber
               });
               console.log(`WhatsApp sent to ${formattedNumber}:`, message.sid);
-            } catch (error: any) { 
+            } catch (error: any) {
               console.error(`Failed to send WhatsApp to ${number}:`, {
                 error: error.message,
                 code: error.code,
@@ -150,15 +151,16 @@ Please contact the customer to confirm the booking.
       .filter(email => email)
 
     if (emailRecipients.length > 0) {
-      await Promise.allSettled(
-        emailRecipients.map(email =>
-          emailTransporter.sendMail({
-            from: process.env.MAIL_FROM,
-            to: email,
-            subject: `New Booking: ${item.name} - Mulago Hospital Guest House`,
-            text: createEmailMessage(booking),
-            html: createEmailHTML(booking),
-          }).catch(error => {
+    const emailTransporter = getEmailTransporter() // Create transporter instance
+    await Promise.allSettled(
+      emailRecipients.map(email =>
+        emailTransporter.sendMail({
+          from: process.env.MAIL_FROM,
+          to: email,
+          subject: `New Booking: ${item.name} - Mulago Hospital Guest House`,
+          text: createEmailMessage(booking),
+          html: createEmailHTML(booking),
+        }).catch(error => {
             console.error(`Failed to send email to ${email}:`, error)
           })
         )
