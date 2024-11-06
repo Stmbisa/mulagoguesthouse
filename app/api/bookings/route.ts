@@ -122,19 +122,27 @@ Please contact the customer to confirm the booking.
       .map(number => number.trim())
       .filter(number => number)
 
-    if (whatsappNumbers.length > 0) {
-      await Promise.allSettled(
-        whatsappNumbers.map(number =>
-          twilioClient.messages.create({
-            body: whatsappMessage,
-            from: process.env.TWILIO_WHATSAPP_FROM,
-            to: number
-          }).catch(error => {
-            console.error(`Failed to send WhatsApp to ${number}:`, error)
+      if (whatsappNumbers.length > 0) {
+        await Promise.allSettled(
+          whatsappNumbers.map(async number => {
+            try {
+              const formattedNumber = number.startsWith('whatsapp:') ? number : `whatsapp:${number}`;
+              const message = await twilioClient.messages.create({
+                body: whatsappMessage,
+                from: process.env.TWILIO_WHATSAPP_FROM,
+                to: formattedNumber
+              });
+              console.log(`WhatsApp sent to ${formattedNumber}:`, message.sid);
+            } catch (error: any) { 
+              console.error(`Failed to send WhatsApp to ${number}:`, {
+                error: error.message,
+                code: error.code,
+                status: error.status
+              });
+            }
           })
-        )
-      )
-    }
+        );
+      }
 
     // Send email notifications
     const emailRecipients = (process.env.NOTIFICATION_EMAIL_RECIPIENTS || '').split(',')
