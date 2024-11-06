@@ -26,7 +26,7 @@ export default function AboutPage() {
           <h2>Our Story</h2>
           <p>
             Located in the heart of Kampala, Mulago Hospital Guest House has been providing exceptional
-            hospitality services since [year]. Our commitment to excellence and attention to
+            hospitality services since 1936. Our commitment to excellence and attention to
             detail has made us a preferred choice for both business and leisure travelers.
           </p>
 
