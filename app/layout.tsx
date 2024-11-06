@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Metadata } from "next";
+import dynamic from 'next/dynamic'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Inter } from "next/font/google";
+import Header from '@/components/Header'
+import Footer from '@/components/Footer'
+const ThemeToggle = dynamic(() => import('@/components/ThemeToggle'), { ssr: false })
 // import MainLayout from "@/components/layout/MainLayout";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -41,7 +45,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <div className="min-h-screen flex flex-col bg-background">
+            <Header />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+            <ThemeToggle />
+          </div>
         </ThemeProvider>
       </body>
     </html>

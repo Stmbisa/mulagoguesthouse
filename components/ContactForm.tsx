@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { motion } from 'framer-motion'
 import { Send } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -28,6 +29,7 @@ const formSchema = z.object({
 
 export default function ContactForm() {
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,8 +54,8 @@ export default function ContactForm() {
         throw new Error('Failed to send message')
       }
 
-      toast.success('Message sent successfully! We will get back to you soon.')
-      form.reset()
+      toast.success('Message sent successfully!')
+      router.push('/contact-success')
     } catch (error) {
       toast.error('Failed to send message. Please try again later.')
     } finally {

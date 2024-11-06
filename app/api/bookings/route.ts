@@ -47,24 +47,24 @@ async function logBooking(log: BookingLog) {
         to: adminEmails,
         subject: `Booking ${log.status.toUpperCase()}: ${log.itemName}`,
         text: `
-Booking Log:
-- Timestamp: ${log.timestamp}
-- Type: ${log.bookingType}
-- Item: ${log.itemName}
-- Customer: ${log.customerEmail}
-- Status: ${log.status}
-${log.error ? `- Error: ${log.error}` : ''}
-        `,
-        html: `
-<h2>Booking Log</h2>
-<ul>
-  <li><strong>Timestamp:</strong> ${log.timestamp}</li>
-  <li><strong>Type:</strong> ${log.bookingType}</li>
-  <li><strong>Item:</strong> ${log.itemName}</li>
-  <li><strong>Customer:</strong> ${log.customerEmail}</li>
-  <li><strong>Status:</strong> ${log.status}</li>
-  ${log.error ? `<li><strong>Error:</strong> ${log.error}</li>` : ''}
-</ul>
+          Booking Log:
+          - Timestamp: ${log.timestamp}
+          - Type: ${log.bookingType}
+          - Item: ${log.itemName}
+          - Customer: ${log.customerEmail}
+          - Status: ${log.status}
+          ${log.error ? `- Error: ${log.error}` : ''}
+                  `,
+                  html: `
+          <h2>Booking Log</h2>
+          <ul>
+            <li><strong>Timestamp:</strong> ${log.timestamp}</li>
+            <li><strong>Type:</strong> ${log.bookingType}</li>
+            <li><strong>Item:</strong> ${log.itemName}</li>
+            <li><strong>Customer:</strong> ${log.customerEmail}</li>
+            <li><strong>Status:</strong> ${log.status}</li>
+            ${log.error ? `<li><strong>Error:</strong> ${log.error}</li>` : ''}
+          </ul>
         `,
       })
     } catch (error) {
